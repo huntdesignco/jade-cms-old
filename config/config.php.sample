@@ -1,0 +1,19 @@
+<?php
+// Some basic configuration settings
+define( 'SITE_DOMAIN', 'jade-cms.local' );
+define( 'SITE_FOLDER', '' );
+define( 'USE_SSL', false );
+
+define( 'SITE_NAME', 'Jade CMS' );
+define( 'SITE_DESC', 'A lightweight and easy to use CMS' );
+
+// Database configuration
+define( 'DB_HOST', 'localhost' );
+define( 'DB_PORT', '3306' );
+define( 'DB_USER', 'root' );
+define( 'DB_PASS', 'root' );
+define( 'DB_NAME', 'jade' );
+define( 'DB_PREFIX', 'jade_' );
+define( 'DB_CHARSET', 'utf8mb4' );
+
+?>

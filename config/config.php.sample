@@ -1,6 +1,6 @@
 <?php
 // Some basic configuration settings
-define( 'SITE_DOMAIN', 'jade-cms.local' );
+define( 'SITE_DOMAIN', 'jade-cms.com' );
 define( 'SITE_FOLDER', '' );
 define( 'USE_SSL', false );
 

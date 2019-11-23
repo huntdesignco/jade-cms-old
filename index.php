@@ -1,12 +1,21 @@
 <?php
-// Load main controller
-require_once('core/jade.php');
-
 // Load website configuration
 require_once('config/config.php');
 
+// Load main controller
+require_once('core/jade.php');
+
 // Initiate core MVC object
 $jade = new Jade\Core();
+
+// Load global functions
+require_once('core/functions.php');
+
+// Load init functions
+require_once('core/init.php');
+
+// Load twig functions
+require_once('core/twig.php');
 
 // Initiate database object
 $jade->db->connect();

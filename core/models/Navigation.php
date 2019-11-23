@@ -7,14 +7,11 @@ class Model
   public $data = array();
 
   public function __construct($route){
-    global $jade;
-
     $this->data = array(
-      'site_url' => $jade->site_url,
-      'current_page' => $jade->current_page,
+      'site_url' => get_site_url(),
+      'current_page' => get_current_page(),
     );
-
-    $this->template = $jade->get_template_path() . '/navigation.html.twig';
+    $this->template = get_template_path() . '/navigation.html.twig';
   }
 }
 

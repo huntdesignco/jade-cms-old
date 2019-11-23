@@ -7,10 +7,7 @@ class Model
   public $data = array();
 
   public function __construct(){
-    global $jade;
-
-    $this->template = $jade->get_template_path() . '/footer.html.twig';
-    
+    $this->template = get_template_path() . '/footer.html.twig';
   }
 }
 

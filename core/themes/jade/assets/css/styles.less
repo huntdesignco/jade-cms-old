@@ -1,0 +1,33 @@
+html, body {
+  height: 100%;
+}
+
+body, wrapper {
+  min-height: 100%;
+}
+
+#footer {
+  height: 85px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  scroll-snap-align: start;
+  bottom: 0;
+
+  a {
+    color: #fff;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+#not-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+}

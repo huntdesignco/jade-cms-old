@@ -4,15 +4,15 @@ namespace Jade;
 // Load composer packages
 require_once('assets/vendor/autoload.php');
 
+// Load router
+require_once('core/router.php');
+
+// Load database
+require_once('core/database.php');
+
 // Set up twig
 use Twig_Environment;
 use Twig_Loader_Filesystem;
-
-// Load router
-require_once('router.php');
-
-// Load database
-require_once('database.php');
 
 class Core
 {
@@ -30,6 +30,8 @@ class Core
   public $page_name;
   public $module_name;
   public $pages;
+
+  public $assets = array();
 
   public function __construct() {
 
@@ -55,12 +57,24 @@ class Core
     $this->loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/');
     $this->twig = new \Twig\Environment($this->loader, $this->options);
 
-    // Create twig function to return navigation menu
-
+    // Create twig function to build navigation menus
     $this->NavBuilder = new \Twig\TwigFunction('build_nav_menu', function ($menu_name, $options) {
-      $this->build_nav_menu($menu_name, $options);
+      build_nav_menu($menu_name, $options);
     }, ['is_safe' => ['html']]);
     $this->twig->addFunction($this->NavBuilder);
+
+    // Create twig function to load javascript assets
+    $this->jsAssets = new \Twig\TwigFunction('load_js_assets', function () {
+      load_js_assets();
+    }, ['is_safe' => ['html']]);
+    $this->twig->addFunction($this->jsAssets);
+
+    // Create twig function to load css assets
+    $this->cssAssets = new \Twig\TwigFunction('load_css_assets', function () {
+      load_css_assets();
+    }, ['is_safe' => ['html']]);
+    $this->twig->addFunction($this->cssAssets);
+
   }
 
   public function header($route) {
@@ -79,6 +93,7 @@ class Core
     $view->render();
 
   }
+  
   public function navigation($route) {
 
     // Load required MVC frameworks
@@ -149,119 +164,7 @@ class Core
 
     // Display page
     $view->render();
-
-  }
-
-  public function build_nav_menu($menu_name, $options) {
-    if ($menu_name == 'primary') {
-
-      // Get all pages marked for primary navbar
-      $table = $this->db->table('pages');
-      $stmt = $this->db->pdo->prepare("SELECT * FROM " . $table . " WHERE is_navbar = 1");
-      $stmt->execute();
-      $pages = $stmt->fetchAll();
-      
-      if ($options['style'] == 'list') {
-        echo '<ul' . (!empty($options['ul_class']) ? ' class="' . $options['ul_class'] . '"' : '') . '>';
-
-        if ($options['show_home']) {
-          echo '<li' . (!empty($options['li_class']) ? ' class="' . $options['li_class'] . ($this->current_page == 'home' && $options['active'] == 'li' ? ' active' : '') . '"' : '') . '>';
-          echo '<a href="' . $this->site_url . '"' . (!empty($options['a_class']) ? 'class="' . $options['a_class'] . '"' : '') . '>' . 'Home' . '</a>';
-          echo '</li>';
-        }
-        
-        foreach ($pages as &$page) {
-          echo '<li' . (!empty($options['li_class']) ? ' class="' . $options['li_class'] . ($this->current_page == $page['slug'] && $options['active'] == 'li' ? ' active' : '') . '"' : '') . '>';
-          echo '<a href="' . $this->site_url . '/' . $page['slug'] . '"' . (!empty($options['a_class']) ? 'class="' . $options['a_class'] . '"' : '') . '>' . $page['name'] . '</a>';
-          echo '</li>';
-        }
-
-        echo '</ul>';
-      }
-    }
-  }
-
-
-  //////////////////////////////
-  // Conditional functions
-  //////////////////////////////
-
-  public function is_page() {
-    if (!empty($this->page_name)) { return true; }
-    else { return false; }
-  }
-  
-  public function is_module() {
-    if (!empty($this->module_name)) { return true; }
-    else { return false; }
-  }
-
-  //////////////////////////////
-  // Get functions
-  //////////////////////////////
-
-  public function get_page_template($slug) {
-
-    // Get page template information via sql
-    $table = $this->db->table('pages');
-    $stmt = $this->db->pdo->prepare("SELECT twig_template FROM " . $table . " WHERE slug = :slug");
-    $stmt->execute(['slug' => $slug]);
-    $result = $stmt->fetch();
-
-    if (!empty($result)) { return $result['twig_template']; }
-    else { return false; }
-
-  }
-
-  public function get_template_path() {
-
-    // Get template path
-    $theme = $this->get_theme_name();
-    if (!$theme) { 
-      return '/themes/jade/templates'; 
-    }
-    else { return '/themes/' . $theme . '/templates'; }
-
-  }
-
-  public function get_page_title() {
-
-    // Determine if is page
-    if ($this->is_page()) { 
-      $table = $this->db->table('pages');
-      $stmt = $this->db->pdo->prepare("SELECT * FROM " . $table . " WHERE slug = :slug");
-      $stmt->execute(['slug' => $this->page_name]);
-      $result = $stmt->fetch();
-    }
-
-    // Determine if is module
-    elseif ($this->is_module()) { 
-      $table = $this->db->table('modules');
-      $stmt = $this->db->pdo->prepare("SELECT * FROM " . $table . " WHERE slug = :slug");
-      $stmt->execute(['slug' => $this->module_name]);
-      $result = $stmt->fetch();
-    }
-
-    if (!empty($result)) { return $result['name'] . ' - ' . $result['title']; }
-    else { return constant('SITE_NAME') . ' - ' . constant('SITE_DESC'); }
-
-  }
-
-  public function get_option($name) {
-
-    // Get option via sql
-    $table = $this->db->table('options');
-
-    $stmt = $this->db->pdo->prepare("SELECT value FROM " . $table . " WHERE name = :name");
-    $stmt->execute(['name' => $name]);
-    $result = $stmt->fetch();
-
-    if (!empty($result)) { return $result['value']; }
-    else { return false; }
-  }
-
-  public function get_theme_name() {
-    return $this->get_option('theme');
+    
   }
 
 }
